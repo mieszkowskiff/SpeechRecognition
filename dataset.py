@@ -6,7 +6,7 @@ import torch
 
 # Parametry
 sample_rate = 16000
-n_mels = 80
+n_mels = 80  # Liczba pasm Mel
 n_fft = 400  # Długość okna FFT
 hop_length = 160  # Przesunięcie okna (np. 160 próbek)
 win_length = n_fft  # Długość okna
@@ -48,7 +48,7 @@ class AudioDataset(Dataset):
     def __getitem__(self, idx):
         # Wczytujemy plik
         waveform, sr = torchaudio.load(self.filepaths[idx])
-        print(self.filepaths[idx])
+        #print(self.filepaths[idx])
         
         # Jeśli stereo, konwertujemy na mono
         if waveform.shape[0] > 1:

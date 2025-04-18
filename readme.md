@@ -12,7 +12,7 @@ The dataset can be found [here](https://www.kaggle.com/c/tensorflow-speech-recog
 
 ## Dependencies
 ```{Bash}
-pip install torchaudio numpy matplotlib
+pip install torchaudio numpy matplotlib scikit-learn
 ```
 
 

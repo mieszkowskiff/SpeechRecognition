@@ -7,6 +7,7 @@ audio_dataset = dataset.AudioDataset(root_dir="./dataset/train", transform=None)
 
 picture, label = audio_dataset[1]
 print(label)
+print(picture.shape)
 picture = picture.numpy().transpose()
 
 

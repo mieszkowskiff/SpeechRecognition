@@ -68,7 +68,7 @@ if __name__ == "__main__":
         input_dir = "./speech_commands",
         output_dir = "./dataset",
         split_ratios = (0.7, 0.2, 0.1),
-        class_list = ["yes", "no"],
+        class_list = ["yes", "no", "up", "down", "left", "right", "on", "off"],
     )
 
 
