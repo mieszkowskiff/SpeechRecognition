@@ -8,7 +8,12 @@ The aim of this project is to implement several deeplearning architectures (incl
 
 ## Dataset
 
-The dataset can be found [here](https://www.kaggle.com/c/tensorflow-speech-recognition-challenge/discussion/46945?fbclid=IwZXh0bgNhZW0CMTEAAR5OByzx2ExdHvDP5ACWn8WsscWpd70PORfKu5J-D-SMwVmZCat6ja1ezkciBQ_aem_yMGkvJ5VDFUNLTSpOpnodw)
+The dataset can be found [here](https://www.kaggle.com/c/tensorflow-speech-recognition-challenge/discussion/46945?fbclid=IwZXh0bgNhZW0CMTEAAR5OByzx2ExdHvDP5ACWn8WsscWpd70PORfKu5J-D-SMwVmZCat6ja1ezkciBQ_aem_yMGkvJ5VDFUNLTSpOpnodw).
+
+## Dependencies
+```{Bash}
+pip install torchaudio numpy matplotlib
+```
 
 
 
