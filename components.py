@@ -63,6 +63,33 @@ class EncoderBlock(nn.Module):
         x = self.ffn(x)
         return x
 
+class AudioClassifier(torch.nn.Module):
+    def __init__(
+            self, 
+            n_classes, 
+            d_embedding = 128, 
+            n_encoder_blocks = 6,
+            d_attention_hidden = 128,
+            d_ffn_hidden = 128,
+            n_heads = 8
+            ):
+        super(AudioClassifier, self).__init__()
+        self.encoder_blocks = torch.nn.ModuleList([EncoderBlock(
+            d_embedding = d_embedding,
+            d_attention_hidden = d_attention_hidden,
+            d_ffn_hidden = d_ffn_hidden,
+            n_heads = n_heads
+            ) for _ in range(n_encoder_blocks)])
+        self.fc = torch.nn.Linear(d_embedding, n_classes)
+
+    def forward(self, x):
+        for block in self.encoder_blocks:
+            x = block(x)
+        x = x.mean(dim=1)
+        x = self.fc(x)
+        return x
+
+
 
 def evaluate_f1_score(model, test_loader, device):
     model.eval()

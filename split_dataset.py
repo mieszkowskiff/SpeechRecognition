@@ -69,6 +69,5 @@ if __name__ == "__main__":
         output_dir = "./dataset",
         split_ratios = (0.7, 0.2, 0.1),
         class_list = class_list,
+        seed = 42
     )
-
-

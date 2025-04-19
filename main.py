@@ -7,64 +7,66 @@ import json
 from datetime import datetime
 import os
 from split_dataset import class_list
+from torchsummary import summary
 
+epochs = 8
 
-class AudioClassifier(torch.nn.Module):
-    def __init__(
-            self, 
-            n_classes, 
-            d_embedding = 128, 
-            n_encoder_blocks = 6,
-            d_attention_hidden = 128,
-            d_ffn_hidden = 128,
-            n_heads = 8
-            ):
-        super(AudioClassifier, self).__init__()
-        self.encoder_blocks = torch.nn.ModuleList([components.EncoderBlock(
-            d_embedding = d_embedding,
-            d_attention_hidden = d_attention_hidden,
-            d_ffn_hidden = d_ffn_hidden,
-            n_heads = n_heads
-            ) for _ in range(n_encoder_blocks)])
-        self.fc = torch.nn.Linear(d_embedding, n_classes)
+config = {
+    "model_parameters": {
+        "d_embedding": 64,
+        "d_attention_hidden": 64,
+        "d_ffn_hidden": 128,
+        "n_encoder_blocks": 4,
+        "n_heads": 12,
+        "model_type": "Transformer",
+    },
+    "dataset_parameters": {
+        "n_fft": 400,
+        "hop_length": 320,
+        "n_mels": 64
+    },
+    "training_parameters": {
+        "batch_size": 32,
+    }
 
-    def forward(self, x):
-        for block in self.encoder_blocks:
-            x = block(x)
-        x = x.mean(dim=1)
-        x = self.fc(x)
-        return x
-    
-
-
+}
 
 
 def main():
-    epochs = 5
-    batch_size = 32
-    d_embedding = 80
-    d_attention_hidden = 128
-    d_ffn_hidden = 128
-    n_encoder_blocks = 2
-    n_heads = 8
-    model_type = "Transformer"
+
+    config["torch_seed"] = 42
+    torch.manual_seed(config["torch_seed"])
+    config["classes"] = class_list
+
+    assert config["model_parameters"]["d_embedding"] == config["dataset_parameters"]["n_mels"], "d_embedding must be equal to n_mels"
+
     
-    train_dataset = dataset.AudioDataset(root_dir="./dataset/train", transform=None)
-    test_dataset = dataset.AudioDataset(root_dir="./dataset/valid", transform=None)
-
-    train_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size = batch_size, shuffle=False)
-
-
-
-    model = AudioClassifier(
-        n_classes = len(class_list),
-        d_embedding = d_embedding,
-        n_encoder_blocks = n_encoder_blocks,
-        d_attention_hidden = d_attention_hidden,
-        d_ffn_hidden = d_ffn_hidden,
-        n_heads = n_heads,
+    train_dataset = dataset.AudioDataset(
+        root_dir="./dataset/train", 
+        n_mels = config["dataset_parameters"]["n_mels"], 
+        n_fft = config["dataset_parameters"]["n_fft"],
+        hop_length = config["dataset_parameters"]["hop_length"]
     )
+    
+    test_dataset = dataset.AudioDataset(
+        root_dir="./dataset/valid", 
+        n_mels = config["dataset_parameters"]["n_mels"], 
+        n_fft = config["dataset_parameters"]["n_fft"],
+        hop_length = config["dataset_parameters"]["hop_length"]
+    )
+
+    train_loader = DataLoader(train_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False)
+
+    model = components.AudioClassifier(
+        n_classes = len(class_list),
+        d_embedding = config["model_parameters"]["d_embedding"],
+        n_encoder_blocks = config["model_parameters"]["n_encoder_blocks"],
+        d_attention_hidden = config["model_parameters"]["d_attention_hidden"],
+        d_ffn_hidden = config["model_parameters"]["d_ffn_hidden"],
+        n_heads = config["model_parameters"]["n_heads"],
+    )
+    summary(model)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     criterion = torch.nn.CrossEntropyLoss()
@@ -72,23 +74,12 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
-    seed = 42
-    torch.manual_seed(seed)
-
     now = datetime.now()
     formatted_time = now.strftime("%Y_%m_%d_%H:%M")
+    config["model_parameters"]["n_params"] = sum(p.numel() for p in model.parameters())
     os.mkdir(f"./models/{formatted_time}")
     with open(f"./models/{formatted_time}/config.json", "w") as f:
-        json.dump({
-            "classes": class_list,
-            "d_embedding": d_embedding,
-            "n_encoder_blocks": n_encoder_blocks,
-            "d_attention_hidden": d_attention_hidden,
-            "d_ffn_hidden": d_ffn_hidden,
-            "n_heads": n_heads,
-            "torch_seed": seed,
-            "model_type": model_type
-        }, f, indent=4)
+        json.dump(config, f, indent=4)
 
     for epoch in range(epochs):
         model.train()
@@ -103,17 +94,12 @@ def main():
             optimizer.step()
         
         f1_score = components.evaluate_f1_score(model, test_loader, device)
-        print(f"F1 Score on valid dataset: {f1_score:.2f}")
+        print(f"F1 Score on valid dataset: {f1_score:.3f}")
 
-        torch.save(model.state_dict(), f"./models/{formatted_time}/model_epoch_{epoch}_f1_{f1_score:.2f}.pth")
-        torch.save(optimizer.state_dict(), f"./models/{formatted_time}/optimizer_epoch_{epoch}_f1_{f1_score:.2f}.pth")
+        torch.save(model.state_dict(), f"./models/{formatted_time}/model_epoch_{epoch}_f1_{f1_score:.3f}.pth")
+        torch.save(optimizer.state_dict(), f"./models/{formatted_time}/optimizer_epoch_{epoch}_f1_{f1_score:.3f}.pth")
         
         
-
-
-
-
-
 
 if __name__ == "__main__":
     main()
