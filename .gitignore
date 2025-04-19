@@ -2,3 +2,5 @@ dataset/
 speech_commands/
 ./venv/
 __pycache__/
+*.json
+*.pth

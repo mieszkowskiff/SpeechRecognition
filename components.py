@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch
-
+from sklearn.metrics import f1_score
 
 class Head(nn.Module):
     def __init__(self, d_embedding = 128, d_hidden = 128):
@@ -64,4 +64,21 @@ class EncoderBlock(nn.Module):
         return x
 
 
+def evaluate_f1_score(model, test_loader, device):
+    model.eval()
+    all_preds = []
+    all_labels = []
+
+    with torch.no_grad():
+        for mel_spec, labels in test_loader:
+            mel_spec = mel_spec.to(device)
+            labels = labels.long().to(device)
+
+            outputs = model(mel_spec)
+            _, preds = torch.max(outputs, 1)
+
+            all_preds.extend(preds.cpu().numpy())
+            all_labels.extend(labels.cpu().numpy())
+    f1 = f1_score(all_labels, all_preds, average='macro')  # or 'weighted', 'micro'
+    return f1
         

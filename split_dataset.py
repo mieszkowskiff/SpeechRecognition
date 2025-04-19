@@ -61,14 +61,14 @@ def split_dataset(input_dir, output_dir, split_ratios=(0.7, 0.2, 0.1), class_lis
 
     print(f"Dataset successfully split. Saved under: {output_dir}")
 
-
+class_list = ["down", "up", "go", "stop", "right", "left", "no", "yes"]
 
 if __name__ == "__main__":
     split_dataset(
         input_dir = "./speech_commands",
         output_dir = "./dataset",
         split_ratios = (0.7, 0.2, 0.1),
-        class_list = ["yes", "no", "up", "down", "left", "right", "on", "off"],
+        class_list = class_list,
     )
 
 
