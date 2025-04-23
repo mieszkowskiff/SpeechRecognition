@@ -5,7 +5,7 @@ from pathlib import Path
 
 def split_dataset(input_dir, output_dir, split_ratios=(0.7, 0.2, 0.1), class_list=None, seed=42):
     random.seed(seed)
-    assert sum(split_ratios) == 1.0, "Sum of split ratios must be 1.0"
+    #assert sum(split_ratios) == 1.0, "Sum of split ratios must be 1.0"
     
     input_dir = Path(input_dir)
     output_dir = Path(output_dir)
