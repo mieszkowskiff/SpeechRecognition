@@ -68,4 +68,4 @@ class AudioDataset(Dataset):
         mel_spec = self.transform(waveform)
         log_mel_spec = log_transform(mel_spec)
 
-        return log_mel_spec.squeeze(0).transpose(0, 1), self.labels[idx]
+        return log_mel_spec, self.labels[idx]

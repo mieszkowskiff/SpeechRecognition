@@ -24,11 +24,11 @@ config = {
     },
     "dataset_parameters": {
         "n_fft": 400,
-        "hop_length": 320,
-        "n_mels": 64
+        "hop_length": 160,
+        "n_mels": 80
     },
     "training_parameters": {
-        "batch_size": 32,
+        "batch_size": 128,
     }
 
 }
@@ -36,20 +36,20 @@ config = {
 class Network(torch.nn.Module):
     def __init__(self):
         super(Network, self).__init__()
-        self.init_block = components.InitBlock(out_channels = 32)
+        self.init_block = components.InitBlock(out_channels = 64)
         self.blocks = torch.nn.ModuleList([
             components.Module(
-                        conv_blocks_number = 0,
-                        in_channels = 32, 
+                        conv_blocks_number = 2,
+                        in_channels = 64, 
                         internal_channels = 64,
                         out_channels = 64,
                         bypass = True,
-                        max_pool = False,
+                        max_pool = True,
                         batch_norm = True,
                         dropout = False
                     ),
             components.Module(
-                        conv_blocks_number = 0,
+                        conv_blocks_number = 2,
                         in_channels = 64, 
                         internal_channels = 128,
                         out_channels = 128,
@@ -57,10 +57,20 @@ class Network(torch.nn.Module):
                         max_pool = False,
                         batch_norm = True,
                         dropout = False
+                    ),
+            components.Module(
+                        conv_blocks_number = 1,
+                        in_channels = 128, 
+                        internal_channels = 256,
+                        out_channels = 256,
+                        bypass = True,
+                        max_pool = False,
+                        batch_norm = True,
+                        dropout = False
                     )
         ]) 
         self.gap = torch.nn.AdaptiveAvgPool2d((1, 1))
-        self.classifier = torch.nn.Linear(128, 8)
+        self.classifier = torch.nn.Linear(256, 8)
 
     def forward(self, x):
         x = self.init_block(x)
@@ -78,67 +88,34 @@ def main():
     print(f"Using device: {device}")
 
         
-    train_dataset = dataset.AudioDataset(root_dir=".\dataset\\train")
-    test_dataset = dataset.AudioDataset(root_dir=".\dataset\\valid")
-
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
-
-    '''
-    for mel_spec, labels in train_loader:
-        print(mel_spec.shape, labels.shape)
-    '''
-    # because of using AutoAugment we have to do different transformations on train and test
-    # AutoAugment only for train
-    '''
-    train_transform = transforms.Compose([
-        AutoAugment(policy=AutoAugmentPolicy.CIFAR10),
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=[0.47889522, 0.47227842, 0.43047404], 
-            std=[0.24205776, 0.23828046, 0.25874835]
-        )
-    ])
-    test_transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=[0.47889522, 0.47227842, 0.43047404], 
-            std=[0.24205776, 0.23828046, 0.25874835]
-        )
-    ])
-
-    train_dataset = datasets.ImageFolder(root = "./data/train", transform = train_transform)
-    test_dataset = datasets.ImageFolder(root = "./data/valid", transform = test_transform)
-
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, 
-        batch_size = 100, 
-        shuffle = True, 
-        pin_memory = True, 
-        num_workers = 2
+    train_dataset = dataset.AudioDataset(
+        root_dir="./dataset/train", 
+        n_mels = config["dataset_parameters"]["n_mels"], 
+        n_fft = config["dataset_parameters"]["n_fft"],
+        hop_length = config["dataset_parameters"]["hop_length"]
     )
-    test_loader = torch.utils.data.DataLoader(
-        test_dataset, 
-        batch_size = 256, 
-        shuffle = False, 
-        pin_memory=True, 
-        num_workers=2
+    
+    test_dataset = dataset.AudioDataset(
+        root_dir="./dataset/valid", 
+        n_mels = config["dataset_parameters"]["n_mels"], 
+        n_fft = config["dataset_parameters"]["n_fft"],
+        hop_length = config["dataset_parameters"]["hop_length"]
     )
-    '''
+
+    train_loader = DataLoader(train_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False)
+    
 
     test_dataset_size = len(test_dataset)
 
     model = Network()
     model.to(device)
-    #summary(model, (3, 32, 32))
 
     criterion = torch.nn.CrossEntropyLoss()
-    # removed weight_decay, regularization not needed
     optimizer = torch.optim.Adam(model.parameters(), lr = 0.0005)
-    # monitor best acc model and save it to chechpoint
     best_acc = 0
 
-    for epoch in range(20):
+    for epoch in range(30):
         print(f"Using device: {device}")
         start_time = time.time()
 
