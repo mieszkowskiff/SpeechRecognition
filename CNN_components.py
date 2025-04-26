@@ -6,16 +6,6 @@ class InitBlock(torch.nn.Module):
         self.init_conv = torch.nn.Conv2d(1, out_channels, kernel_size = 3, stride = 1, padding = 1)
     
     def forward(self, x):
-        # since AutoAugment is applied in transforms.Compose()
-        # we dont use previous augmentation
-        if False:
-            x = torch.nn.Sequential(
-                transforms.RandomAffine(degrees = 14, translate = (0.1, 0.1), scale = (0.7, 1.3)),
-                transforms.RandomHorizontalFlip(p=0.3),
-                #transforms.RandomVerticalFlip(p=0.3),
-                K.RandomGaussianBlur((3, 3), (0.1, 0.3), p=0.2),
-                K.RandomGaussianNoise(mean=0.0, std=0.02, p=0.2)
-            )(x)
         x = self.init_conv(x)
         return torch.nn.functional.relu(x, inplace = True)
 

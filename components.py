@@ -1,5 +1,6 @@
 import torch.nn as nn
 import torch
+import tqdm._tqdm
 from sklearn.metrics import f1_score
 
 class Head(nn.Module):
@@ -97,7 +98,7 @@ def evaluate_f1_score(model, test_loader, device):
     all_labels = []
 
     with torch.no_grad():
-        for mel_spec, labels in test_loader:
+        for mel_spec, labels in tqdm.tqdm(test_loader):
             mel_spec = mel_spec.to(device)
             labels = labels.long().to(device)
 

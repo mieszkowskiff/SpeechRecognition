@@ -65,7 +65,7 @@ class_list = ["down", "up", "go", "stop", "right", "left", "no", "yes"]
 
 if __name__ == "__main__":
     split_dataset(
-        input_dir = "./speech_commands",
+        input_dir = "./speech_commands_v0.02",
         output_dir = "./dataset",
         split_ratios = (0.7, 0.2, 0.1),
         class_list = class_list,
