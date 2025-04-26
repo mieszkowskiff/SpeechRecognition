@@ -6,18 +6,19 @@ import tqdm
 import json
 from datetime import datetime
 import os
-from split_dataset import class_list
+#from split_dataset import class_list
 from torchsummary import summary
 
-epochs = 8
+class_list = class_list = ["background", "down", "go", "left", "no", "right", "stop", "unknown", "up", "yes"]
+epochs = 15
 
 config = {
     "model_parameters": {
         "d_embedding": 64,
-        "d_attention_hidden": 64,
-        "d_ffn_hidden": 128,
-        "n_encoder_blocks": 4,
-        "n_heads": 12,
+        "d_attention_hidden": 128,
+        "d_ffn_hidden": 256,
+        "n_encoder_blocks": 6,
+        "n_heads": 8,
         "model_type": "Transformer",
     },
     "dataset_parameters": {
@@ -26,11 +27,10 @@ config = {
         "n_mels": 64
     },
     "training_parameters": {
-        "batch_size": 32,
+        "batch_size": 512,
     }
 
 }
-
 
 def main():
 
@@ -42,7 +42,8 @@ def main():
 
     
     train_dataset = dataset.AudioDataset(
-        root_dir="./dataset/train", 
+        root_dir="./dataset/train",
+        class_list=class_list,
         n_mels = config["dataset_parameters"]["n_mels"], 
         n_fft = config["dataset_parameters"]["n_fft"],
         hop_length = config["dataset_parameters"]["hop_length"]
@@ -50,13 +51,14 @@ def main():
     
     test_dataset = dataset.AudioDataset(
         root_dir="./dataset/valid", 
+        class_list=class_list,
         n_mels = config["dataset_parameters"]["n_mels"], 
         n_fft = config["dataset_parameters"]["n_fft"],
         hop_length = config["dataset_parameters"]["hop_length"]
     )
 
-    train_loader = DataLoader(train_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=True, num_workers=4)
+    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False, num_workers=4)
 
     model = components.AudioClassifier(
         n_classes = len(class_list),
@@ -66,18 +68,19 @@ def main():
         d_ffn_hidden = config["model_parameters"]["d_ffn_hidden"],
         n_heads = config["model_parameters"]["n_heads"],
     )
-    summary(model)
+    #summary(model, (1, 32, 32))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     criterion = torch.nn.CrossEntropyLoss()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
     model.to(device)
 
     now = datetime.now()
-    formatted_time = now.strftime("%Y_%m_%d_%H:%M")
+    formatted_time = now.strftime("%Y_%m_%d_%H_%M")
     config["model_parameters"]["n_params"] = sum(p.numel() for p in model.parameters())
-    os.mkdir(f"./models/{formatted_time}")
+    os.makedirs(f"./models/{formatted_time}", exist_ok=True)
     with open(f"./models/{formatted_time}/config.json", "w") as f:
         json.dump(config, f, indent=4)
 
