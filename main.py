@@ -9,26 +9,26 @@ import os
 from split_dataset import class_list
 from torchsummary import summary
 
-epochs = 8
+epochs = 12
 
 config = {
     "model_parameters": {
         "d_embedding": 64,
-        "d_attention_hidden": 64,
-        "d_ffn_hidden": 128,
-        "n_encoder_blocks": 4,
+        "d_attention_hidden": 32,
+        "d_ffn_hidden": 32,
+        "n_encoder_blocks": 5,
         "n_heads": 12,
         "model_type": "Transformer",
+        "positional_encoding": True,
     },
     "dataset_parameters": {
         "n_fft": 400,
-        "hop_length": 320,
+        "hop_length": 100,
         "n_mels": 64
     },
     "training_parameters": {
-        "batch_size": 32,
+        "batch_size": 64,
     }
-
 }
 
 
@@ -65,6 +65,7 @@ def main():
         d_attention_hidden = config["model_parameters"]["d_attention_hidden"],
         d_ffn_hidden = config["model_parameters"]["d_ffn_hidden"],
         n_heads = config["model_parameters"]["n_heads"],
+        positional_encoding = config["model_parameters"]["positional_encoding"]
     )
     summary(model)
 
