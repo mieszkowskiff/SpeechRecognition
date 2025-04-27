@@ -9,6 +9,29 @@ log_transform = T.AmplitudeToDB(stype="power")
 # Ścieżka do folderu
 root_dir = './data/train'
 
+class PreprocessedAudioDataset(Dataset):
+    def __init__(self, root_dir, class_list):
+        self.root_dir = root_dir
+        self.filepaths = []
+        self.labels = []
+        self.class_list = class_list
+
+        for i, label in enumerate(class_list):
+            folder = os.path.join(root_dir, label)
+            if os.path.isdir(folder):
+                for file in os.listdir(folder):
+                    if file.endswith('.pt'):
+                        self.filepaths.append(os.path.join(folder, file))
+                        self.labels.append(i)
+        
+    def __len__(self):
+        return len(self.filepaths)
+
+    def __getitem__(self, idx):
+        log_mel_spec = torch.load(self.filepaths[idx])
+        label = self.labels[idx]
+        return log_mel_spec, label
+
 class AudioDataset(Dataset):
     def __init__(
             self, 

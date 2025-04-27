@@ -8,7 +8,7 @@ from torchsummary import summary
 from torch.amp import autocast, GradScaler
 from torch.utils.data import DataLoader
 
-import utils.CNN_dataset as dataset
+from utils.CNN_dataset import PreprocessedAudioDataset
 import utils.CNN_components as components
 
 config = {
@@ -26,7 +26,7 @@ config = {
         "n_mels": 80
     },
     "training_parameters": {
-        "batch_size": 256,
+        "batch_size": 128,
     }
 
 }
@@ -76,25 +76,18 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-        
-    train_dataset = dataset.AudioDataset(
-        root_dir="./dataset/train", 
-        class_list=class_list,
-        n_mels = config["dataset_parameters"]["n_mels"], 
-        n_fft = config["dataset_parameters"]["n_fft"],
-        hop_length = config["dataset_parameters"]["hop_length"]
+    train_dataset = PreprocessedAudioDataset(
+        root_dir="./preprocessed_dataset/train",
+        class_list=class_list
     )
     
-    test_dataset = dataset.AudioDataset(
-        root_dir="./dataset/valid",
-        class_list=class_list, 
-        n_mels = config["dataset_parameters"]["n_mels"], 
-        n_fft = config["dataset_parameters"]["n_fft"],
-        hop_length = config["dataset_parameters"]["hop_length"]
+    test_dataset = PreprocessedAudioDataset(
+        root_dir="./preprocessed_dataset/valid",
+        class_list=class_list
     )
 
-    train_loader = DataLoader(train_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=True, num_workers=4)
-    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False, num_workers=4)
+    train_loader = DataLoader(train_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=True, num_workers=4, pin_memory=True)
+    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False, num_workers=4, pin_memory=True)
     
     test_dataset_size = len(test_dataset)
 
@@ -114,7 +107,6 @@ def main():
         total_loss = 0
         
         for images, labels in tqdm.tqdm(train_loader):
-            torch.cuda.empty_cache()
             device_images, device_labels = images.to(device), labels.long().to(device)
             optimizer.zero_grad()
 

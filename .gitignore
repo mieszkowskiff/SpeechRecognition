@@ -3,6 +3,7 @@ dataset_grouped/
 kaggle/
 models/
 notes/
+dataset_preprocessed/
 speech_commands/
 ./venv/
 __pycache__/
