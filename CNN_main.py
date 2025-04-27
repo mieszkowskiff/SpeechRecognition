@@ -32,7 +32,7 @@ config = {
 
 }
 
-class_list = ["down", "up", "go", "stop", "right", "left", "no", "yes", "background", "unknown"]
+class_list = ["down", "up", "go", "stop", "right", "left", "no", "yes", "on", "off", "background", "unknown"]
 
 class Network(torch.nn.Module):
     def __init__(self):
@@ -102,8 +102,8 @@ def main():
         hop_length = config["dataset_parameters"]["hop_length"]
     )
 
-    train_loader = DataLoader(train_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=True, num_workers=4)
+    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False, num_workers=4)
     
     test_dataset_size = len(test_dataset)
 

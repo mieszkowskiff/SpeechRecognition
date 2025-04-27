@@ -6,16 +6,40 @@ import random
 input_dir = "./files_to_cut"
 base_output_dir = "./samples"
 
-split_ratios = {
-    "train": 0.7,
-    "validation": 0.2,
-    "test": 0.1,
-}
-
 chunk_length_ms = 1000
-overlap_ms = 500
+overlap_ms = 800
 step_ms = chunk_length_ms - overlap_ms
 
+idx = 0
+for filename in os.listdir(input_dir):
+    if not filename.lower().endswith(".wav"):
+        continue
+
+    file_path = os.path.join(input_dir, filename)
+    file_name = os.path.splitext(filename)[0]
+    output_path = os.path.join(base_output_dir)
+
+    print(f"\n Processing: {filename}")
+
+    # Load & convert audio
+    audio = AudioSegment.from_wav(file_path).set_channels(1).set_frame_rate(16000)
+
+    # Slice into overlapping chunks
+    chunks = []
+    for i in range(0, len(audio) - chunk_length_ms + 1, step_ms):
+        chunk = audio[i:i + chunk_length_ms]
+        chunks.append(chunk)
+        idx += 1
+        out_file = os.path.join(output_path, f"{file_name}_{idx}.wav")
+        chunk.export(out_file, format="wav")
+
+    print(f" Total chunks for {file_name}: {len(chunks)}")
+    
+
+print(f" Total chunks : {idx+1}")
+
+
+'''
 def enhance_chunk(chunk, gain_range_db=(2, 6), noise_amp_range=(-50, -40)):
     """
     Apply random gain and white noise to an AudioSegment.
@@ -30,32 +54,9 @@ def enhance_chunk(chunk, gain_range_db=(2, 6), noise_amp_range=(-50, -40)):
     chunk = chunk.overlay(noise)
 
     return chunk
+'''
 
-# === VALIDATE RATIOS ===
-assert abs(sum(split_ratios.values()) - 1.0) < 1e-6, "Ratios must sum to 1.0"
-
-# === PROCESS EACH FILE ===
-for filename in os.listdir(input_dir):
-    if not filename.lower().endswith(".wav"):
-        continue
-
-    file_path = os.path.join(input_dir, filename)
-    file_name = os.path.splitext(filename)[0]
-    output_path = os.path.join(base_output_dir, file_name)
-
-    print(f"\n Processing: {filename}")
-
-    # Load & convert audio
-    audio = AudioSegment.from_wav(file_path).set_channels(1).set_frame_rate(16000)
-
-    # Slice into overlapping chunks
-    chunks = []
-    for i in range(0, len(audio) - chunk_length_ms + 1, step_ms):
-        chunk = audio[i:i + chunk_length_ms]
-        chunks.append(chunk)
-
-    print(f" Total chunks: {len(chunks)}")
-
+'''
     # Shuffle and split
     random.shuffle(chunks)
     n = len(chunks)
@@ -74,10 +75,10 @@ for filename in os.listdir(input_dir):
         os.makedirs(split_dir, exist_ok=True)
 
         for idx, chunk in enumerate(split_chunks):
-            enhanced_chunk = enhance_chunk(chunk)
             out_file = os.path.join(split_dir, f"{file_name}_{idx}.wav")
-            enhanced_chunk.export(out_file, format="wav")
+            chunk.export(out_file, format="wav")
 
         print(f" {split_name}: {len(split_chunks)} chunks saved in {split_dir}")
 
 print("\n All files processed!")
+    '''
