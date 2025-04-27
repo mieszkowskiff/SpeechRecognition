@@ -69,3 +69,27 @@ class AudioDataset(Dataset):
         log_mel_spec = log_transform(mel_spec)
 
         return log_mel_spec.squeeze(0).transpose(0, 1), self.labels[idx]
+    
+def get_observation(
+        path,
+        n_mels = 64,
+        n_fft = 400,
+        hop_length = 100
+    ):
+    waveform, sr = torchaudio.load(path)
+
+        
+        # Jeśli stereo, konwertujemy na mono
+    if waveform.shape[0] > 1:
+            waveform = waveform.mean(dim=0, keepdim=True)
+    transform = T.MelSpectrogram(
+        sample_rate = sr,
+        n_mels = n_mels,
+        n_fft = n_fft,
+        hop_length = hop_length,
+        win_length = n_fft
+    )
+    mel_spec = transform(waveform)
+    log_mel_spec = log_transform(mel_spec)
+    return log_mel_spec.squeeze(0).transpose(0, 1)
+

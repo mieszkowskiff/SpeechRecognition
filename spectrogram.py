@@ -3,25 +3,33 @@ import torch
 import matplotlib.pyplot as plt
 
 
-audio_dataset = dataset.AudioDataset(root_dir="./dataset/train", transform=None)
-
-picture, label = audio_dataset[1]
-print(label)
-print(picture.shape)
-picture = picture.numpy().transpose()
 
 
+def create_spectrogram(picture):
+    picture = picture.numpy().transpose()
+    plt.imshow(picture, aspect='auto', origin='lower', cmap='viridis')
+    plt.title('Mel-Spectrogram')
+    plt.xlabel('Time Frame')
+    plt.ylabel('Mel Frequency Band')
+    plt.colorbar(format='%+2.0f dB')
+    plt.show()
+
+def main():
+    audio_dataset = dataset.AudioDataset(
+        root_dir="./dataset/train",
+        n_mels=64,
+        n_fft=400,
+        hop_length=100
+        )
+    picture, label = audio_dataset[12892]
+    print(label)
+    print(picture.shape)
+    create_spectrogram(picture)
+
+if __name__ == "__main__":
+    main()
 
 
-plt.imshow(picture, aspect='auto', origin='lower', cmap='viridis')
 
-# Dodawanie tytułu, etykiet osi
-plt.title('Mel-Spectrogram')
-plt.xlabel('Time Frame')  # Czas w jednostkach klatek
-plt.ylabel('Mel Frequency Band')  # Pasma Mel (częstotliwości)
 
-# Dodanie paska kolorów
-plt.colorbar(format='%+2.0f dB')
 
-# Pokazanie wykresu
-plt.show()

@@ -1,8 +1,8 @@
 import glob
 import matplotlib.pyplot as plt
-import numpy as np
+import matplotlib.ticker as ticker
 
-path = "./models/2025_04_27_12:56/"
+path = "./models/2025_04_27_14:10/"
 
 # Get all files in the directory
 files = glob.glob(f"{path}model_epoch_*.pth")
@@ -16,6 +16,10 @@ plt.xlabel("Epoch")
 plt.ylabel("F1 Score")
 plt.title("F1 Score vs Epoch")
 plt.grid()
+
+ax = plt.gca()  # Pobierz aktualne Axes
+ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))  # tylko całkowite wartości
+
 plt.savefig(f"./images/learning_curve.png")
 
 
