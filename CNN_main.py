@@ -26,7 +26,7 @@ config = {
         "n_mels": 80
     },
     "training_parameters": {
-        "batch_size": 128,
+        "batch_size": 180,
     }
 
 }
@@ -77,12 +77,12 @@ def main():
     print(f"Using device: {device}")
 
     train_dataset = PreprocessedAudioDataset(
-        root_dir="./preprocessed_dataset/train",
+        root_dir="./dataset_preprocessed/train",
         class_list=class_list
     )
     
     test_dataset = PreprocessedAudioDataset(
-        root_dir="./preprocessed_dataset/valid",
+        root_dir="./dataset_preprocessed/valid",
         class_list=class_list
     )
 
