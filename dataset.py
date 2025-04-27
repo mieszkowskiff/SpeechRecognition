@@ -14,9 +14,9 @@ class AudioDataset(Dataset):
             self, 
             root_dir, 
             target_len = 16000,
-            n_mels = 80,  # Liczba pasm Mel
-            n_fft = 400,  # Długość okna FFT
-            hop_length = 160, # Przesunięcie okna (np. 160 próbek)
+            n_mels = 80,
+            n_fft = 400,
+            hop_length = 160,
             ):
         self.root_dir = root_dir
         self.target_len = target_len
@@ -45,26 +45,19 @@ class AudioDataset(Dataset):
         return len(self.filepaths)
 
     def __getitem__(self, idx):
-        # Wczytujemy plik
+
         waveform, sr = torchaudio.load(self.filepaths[idx])
 
-        
-        # Jeśli stereo, konwertujemy na mono
         if waveform.shape[0] > 1:
             waveform = waveform.mean(dim=0, keepdim=True)
 
-        # waveform = waveform.flip(1)
 
-        # Upewniamy się, że długość sygnału audio to 16000
         if waveform.size(1) < self.target_len:
-            # Dodajemy padding na końcu, jeśli za krótka
             pad_len = self.target_len - waveform.size(1)
             waveform = torch.nn.functional.pad(waveform, (0, pad_len))
         elif waveform.size(1) > self.target_len:
-            # Przycinamy do 16000 próbek, jeśli za długa
             waveform = waveform[:, :self.target_len]
         
-        # Generujemy log-Mel spektrogram
         mel_spec = self.transform(waveform)
         log_mel_spec = log_transform(mel_spec)
 

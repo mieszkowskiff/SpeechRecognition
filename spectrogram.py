@@ -5,14 +5,17 @@ import matplotlib.pyplot as plt
 
 
 
-def create_spectrogram(picture):
-    picture = picture.numpy().transpose()
-    plt.imshow(picture, aspect='auto', origin='lower', cmap='viridis')
-    plt.title('Mel-Spectrogram')
-    plt.xlabel('Time Frame')
-    plt.ylabel('Mel Frequency Band')
-    plt.colorbar(format='%+2.0f dB')
-    plt.show()
+def create_spectrogram(picture, filename):
+    picture = picture.cpu().numpy().transpose()
+    fig, ax = plt.subplots(figsize=(8, 6))
+    cax = ax.imshow(picture, aspect='auto', origin='lower', cmap='viridis')
+    ax.set_title('Mel-Spectrogram')
+    ax.set_xlabel('Time Frame')
+    ax.set_ylabel('Mel Frequency Band')
+    #fig.colorbar(cax, ax=ax, format='%+2.0f dB')
+    fig.tight_layout()
+    fig.savefig(filename, dpi=300)
+    plt.close(fig)
 
 def main():
     audio_dataset = dataset.AudioDataset(
@@ -24,7 +27,7 @@ def main():
     picture, label = audio_dataset[12892]
     print(label)
     print(picture.shape)
-    create_spectrogram(picture)
+    create_spectrogram(picture, filename="./images/input.png")
 
 if __name__ == "__main__":
     main()

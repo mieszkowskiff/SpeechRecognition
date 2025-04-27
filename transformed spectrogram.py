@@ -6,7 +6,7 @@ import dataset
 import spectrogram
 
 
-observation_path = "./dataset/valid/stop/0b56bcfe_nohash_1.wav"
+observation_path = "./audio/sheila/fe1916ba_nohash_1.wav"
 
 model_path = "./models/2025_04_27_14:10/"
 
@@ -38,10 +38,27 @@ observation = dataset.get_observation(
     hop_length = config["dataset_parameters"]["hop_length"]
 )
 
-spectrogram.create_spectrogram(observation)
+spectrogram.create_spectrogram(observation, filename="./images/0.png")
+
+
+
+intermediate_outputs = {}
+
+def get_activation(name):
+    def hook(model, input, output):
+        intermediate_outputs[name] = output
+    return hook
+
+for block_id in range(len(model.encoder_blocks)):
+    model.encoder_blocks[block_id].register_forward_hook(get_activation(block_id))
+
 
 with torch.no_grad():
     output = model(observation.unsqueeze(0).to(device))
     pred = torch.argmax(output, dim=1)
     predicted_class = config["classes"][pred.item()]
     print(f"Predicted class: {predicted_class}")
+
+
+for key, value in intermediate_outputs.items():
+    spectrogram.create_spectrogram(value[0].cpu(), filename=f"./images/{key + 1}.png")

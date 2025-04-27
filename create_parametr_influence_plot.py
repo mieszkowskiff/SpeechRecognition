@@ -21,19 +21,19 @@ for i in range(f1s.shape[0]):
     for j in range(f1s.shape[1]):
         plt.text(j, i, "overfit" if (i == 2 and j == 2 )or (i == 2 and j == 3) or (i == 1 and j == 3) else f"{f1s[i, j]:.3f}",
                  horizontalalignment="center",
-                 color="black",
+                 color="white" if i == 0 and (j == 2 or j == 3) else "black",
                  fontsize=20)
         plt.text(j, i + 0.35, f"{parameters[i, j]:,}".replace(",", " "),
                     horizontalalignment="center",
-                    color="black",
+                    color= "white" if i == 0 and (j == 2 or j == 3) else "black",
                     fontsize=12)
         
 plt.title('F1 Score Matrix', fontsize=20)
 plt.ylabel('#Heads', fontsize=20)
 plt.xlabel('#Blocks', fontsize=20)
-tick_marks = range(3)
-plt.xticks(tick_marks, [2, 6, 10], fontsize = 16)
-plt.yticks(tick_marks, [2, 6, 10], fontsize = 16)
+
+plt.xticks(range(4), [2, 6, 10, 14], fontsize = 16)
+plt.yticks(range(3), [2, 6, 10], fontsize = 16)
 plt.tight_layout()
 plt.savefig(f"./images/f1s_matrix.png")
 
