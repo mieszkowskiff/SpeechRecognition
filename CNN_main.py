@@ -1,16 +1,15 @@
-from torchsummary import summary
-from torch.amp import autocast, GradScaler
-
-import CNN_dataset as dataset
-from torch.utils.data import DataLoader
-
 import torch
 import time
 import tqdm
 import copy
 import shutil
 
-import CNN_components as components
+from torchsummary import summary
+from torch.amp import autocast, GradScaler
+from torch.utils.data import DataLoader
+
+import utils.CNN_dataset as dataset
+import utils.CNN_components as components
 
 config = {
     "model_parameters": {
@@ -27,7 +26,7 @@ config = {
         "n_mels": 80
     },
     "training_parameters": {
-        "batch_size": 128,
+        "batch_size": 256,
     }
 
 }
@@ -58,20 +57,10 @@ class Network(torch.nn.Module):
                         max_pool = True,
                         batch_norm = True,
                         dropout = False
-                    ),
-            components.Module(
-                        conv_blocks_number = 2,
-                        in_channels = 128, 
-                        internal_channels = 256,
-                        out_channels = 256,
-                        bypass = True,
-                        max_pool = False,
-                        batch_norm = True,
-                        dropout = False
                     )
         ]) 
         self.gap = torch.nn.AdaptiveAvgPool2d((1, 1))
-        self.classifier = torch.nn.Linear(256, 10)
+        self.classifier = torch.nn.Linear(128, 12)
 
     def forward(self, x):
         x = self.init_block(x)
@@ -90,13 +79,15 @@ def main():
         
     train_dataset = dataset.AudioDataset(
         root_dir="./dataset/train", 
+        class_list=class_list,
         n_mels = config["dataset_parameters"]["n_mels"], 
         n_fft = config["dataset_parameters"]["n_fft"],
         hop_length = config["dataset_parameters"]["hop_length"]
     )
     
     test_dataset = dataset.AudioDataset(
-        root_dir="./dataset/valid", 
+        root_dir="./dataset/valid",
+        class_list=class_list, 
         n_mels = config["dataset_parameters"]["n_mels"], 
         n_fft = config["dataset_parameters"]["n_fft"],
         hop_length = config["dataset_parameters"]["hop_length"]
@@ -114,7 +105,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr = 0.0005)
     best_acc = 0
 
-    for epoch in range(30):
+    for epoch in range(1):
         print(f"Using device: {device}")
         start_time = time.time()
 
