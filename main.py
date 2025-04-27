@@ -9,14 +9,14 @@ import os
 from split_dataset import class_list, is_balanced, unknown_coef
 from torchsummary import summary
 
-epochs = 12
+epochs = 20
 
 config = {
     "model_parameters": {
         "d_embedding": 64,
         "d_attention_hidden": 64,
         "d_ffn_hidden": 32,
-        "n_encoder_blocks": 12,
+        "n_encoder_blocks": 10,
         "n_heads": 2,
         "model_type": "Transformer",
         "positional_encoding": True,

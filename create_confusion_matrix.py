@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 import tqdm
 
 
-model_path = "./models/2025_04_27_00:14/"
+model_path = "./models/2025_04_27_12:56/"
 
-model_epoch = 9
+model_epoch = 11
 
 config = json.load(open(f"{model_path}config.json"))
 
