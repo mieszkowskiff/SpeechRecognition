@@ -11,18 +11,19 @@ import tqdm
 import sys
 
 sys.path.append("..")
-import dataset
+from utils.CNN_dataset import PreprocessedAudioDataset
 sys.path.remove("..")
        
 sys.path.append("..")
-import model_init.klapsuf_10 as model_arch
+import model_init.model_10_20 as model_arch
 sys.path.remove("..")
 
-choose_model = "klapsuf_10"
+choose_model = "model_10_20"
 
 #class_list = ["down", "go", "left", "no", "right", "stop", "up", "yes"]
 #class_list = ["background", "down", "go", "left", "no", "right", "stop", "up", "yes"]
 class_list = ["background", "down", "go", "left", "no", "right", "stop", "unknown", "up", "yes"]
+class_list = ["down", "up", "go", "stop", "right", "left", "no", "yes", "on", "off", "background", "unknown"]
   
 config = {
     "model_parameters": {
@@ -39,7 +40,7 @@ config = {
         "n_mels": 80
     },
     "training_parameters": {
-        "batch_size": 256,
+        "batch_size": 512,
     }
 
 }
@@ -47,16 +48,13 @@ config = {
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
-    
-    test_dataset = dataset.AudioDataset(
-        root_dir="../dataset/test", 
-        class_list=class_list,
-        n_mels = config["dataset_parameters"]["n_mels"], 
-        n_fft = config["dataset_parameters"]["n_fft"],
-        hop_length = config["dataset_parameters"]["hop_length"]
+
+    test_dataset = PreprocessedAudioDataset(
+        root_dir="../dataset_preprocessed/test",
+        class_list=class_list
     )
 
-    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False, num_workers=4, pin_memory=True)
     
     test_dataset_size = len(test_dataset)
 

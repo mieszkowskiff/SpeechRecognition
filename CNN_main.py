@@ -26,7 +26,7 @@ config = {
         "n_mels": 80
     },
     "training_parameters": {
-        "batch_size": 180,
+        "batch_size": 200,
     }
 
 }
@@ -39,31 +39,42 @@ class Network(torch.nn.Module):
         self.init_block = components.InitBlock(out_channels = 64)
         self.blocks = torch.nn.ModuleList([
             components.Module(
-                        conv_blocks_number = 1,
+                        conv_blocks_number = 0,
                         in_channels = 64, 
                         internal_channels = 64,
-                        out_channels = 64,
+                        out_channels = 128,
                         bypass = True,
                         max_pool = True,
                         batch_norm = True,
                         dropout = False
                     ),
             components.Module(
-                        conv_blocks_number = 2,
-                        in_channels = 64, 
+                        conv_blocks_number = 1,
+                        in_channels = 128, 
                         internal_channels = 128,
                         out_channels = 128,
                         bypass = True,
                         max_pool = True,
                         batch_norm = True,
                         dropout = False
+                    ),
+            components.Module(
+                        conv_blocks_number = 1,
+                        in_channels = 128, 
+                        internal_channels = 256,
+                        out_channels = 256,
+                        bypass = True,
+                        max_pool = False,
+                        batch_norm = True,
+                        dropout = False
                     )
         ]) 
         self.gap = torch.nn.AdaptiveAvgPool2d((1, 1))
-        self.classifier = torch.nn.Linear(128, 12)
+        self.classifier = torch.nn.Linear(256, 12)
 
     def forward(self, x):
         x = self.init_block(x)
+        # this relu does nothing ?
         x = torch.nn.functional.relu(x)
         for it in self.blocks:
             x = it(x)
@@ -95,10 +106,10 @@ def main():
     model.to(device)
 
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr = 0.0005)
+    optimizer = torch.optim.Adam(model.parameters(), lr = 0.0001)
     best_acc = 0
 
-    for epoch in range(1):
+    for epoch in range(30):
         print(f"Using device: {device}")
         start_time = time.time()
 

@@ -5,6 +5,8 @@ models/
 notes/
 dataset_preprocessed/
 speech_commands/
+model_analysis/conf_matrix/
+dataset_high_res_preprocessed/
 ./venv/
 __pycache__/
 *.json

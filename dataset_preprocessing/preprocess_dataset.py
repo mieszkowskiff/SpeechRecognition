@@ -6,13 +6,18 @@ from tqdm import tqdm
 
 # Original and target directories
 SOURCE_DIR = '../dataset'
-TARGET_DIR = '../dataset_preprocessed'
+TARGET_DIR = '../dataset_high_res_preprocessed'
 
 # Parameters for MelSpectrogram
 TARGET_LEN = 16000
+N_MELS = 256
+N_FFT =512
+HOP_LENGTH = 100
+'''
 N_MELS = 80
 N_FFT = 400
 HOP_LENGTH = 160
+'''
 
 mel_transform = T.MelSpectrogram(
     sample_rate=TARGET_LEN,  # Assuming 16kHz audio

@@ -1,6 +1,7 @@
 import torchaudio
 from torch.utils.data import Dataset
 import torchaudio.transforms as T
+import torch.nn.functional as F
 import os
 import torch
 
@@ -8,6 +9,40 @@ log_transform = T.AmplitudeToDB(stype="power")
 
 # Ścieżka do folderu
 root_dir = './data/train'
+
+class DynamicResolutionDataset(torch.utils.data.Dataset):
+    def __init__(self, root_dir, class_list, target_n_mels=256):
+        self.root_dir = root_dir
+        self.filepaths = []
+        self.labels = []
+        self.target_n_mels = target_n_mels
+        self.class_list = class_list
+
+        for i, label in enumerate(class_list):
+            folder = os.path.join(root_dir, label)
+            if os.path.isdir(folder):
+                for file in os.listdir(folder):
+                    if file.endswith('.pt'):
+                        self.filepaths.append(os.path.join(folder, file))
+                        self.labels.append(i)
+        
+    def __len__(self):
+        return len(self.filepaths)
+
+    def __getitem__(self, idx):
+        log_mel_spec = torch.load(self.filepaths[idx])  # (1, 256, 155)
+
+        if self.target_n_mels != 256:
+            log_mel_spec = log_mel_spec.unsqueeze(0)  # Add batch dimension
+            log_mel_spec = F.interpolate(
+                log_mel_spec, 
+                size=(self.target_n_mels, 155), 
+                mode='bilinear', 
+                align_corners=False
+            )
+            log_mel_spec = log_mel_spec.squeeze(0)  # Remove batch dimension
+
+        return log_mel_spec, self.labels[idx]
 
 class PreprocessedAudioDataset(Dataset):
     def __init__(self, root_dir, class_list):

@@ -1,4 +1,6 @@
 import torch
+import tqdm
+from sklearn.metrics import f1_score
 
 class InitBlock(torch.nn.Module):
     def __init__(self, out_channels = 32):
@@ -109,3 +111,21 @@ class HeadBlock(torch.nn.Module):
         x = torch.nn.Flatten()(x)
         x = self.head(x)
         return x
+    
+def evaluate_f1_score(model, test_loader, device):
+    model.eval()
+    all_preds = []
+    all_labels = []
+
+    with torch.no_grad():
+        for mel_spec, labels in tqdm.tqdm(test_loader):
+            mel_spec = mel_spec.to(device)
+            labels = labels.long().to(device)
+
+            outputs = model(mel_spec)
+            _, preds = torch.max(outputs, 1)
+
+            all_preds.extend(preds.cpu().numpy())
+            all_labels.extend(labels.cpu().numpy())
+    f1 = f1_score(all_labels, all_preds, average='macro', zero_division=1)
+    return f1
