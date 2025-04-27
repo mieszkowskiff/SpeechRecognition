@@ -4,3 +4,5 @@ speech_commands/
 __pycache__/
 *.json
 *.pth
+*.png
+audio/

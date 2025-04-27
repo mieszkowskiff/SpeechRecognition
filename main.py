@@ -6,7 +6,7 @@ import tqdm
 import json
 from datetime import datetime
 import os
-from split_dataset import class_list
+from split_dataset import class_list, is_balanced, unknown_coef
 from torchsummary import summary
 
 epochs = 12
@@ -14,10 +14,10 @@ epochs = 12
 config = {
     "model_parameters": {
         "d_embedding": 64,
-        "d_attention_hidden": 32,
+        "d_attention_hidden": 64,
         "d_ffn_hidden": 32,
-        "n_encoder_blocks": 5,
-        "n_heads": 12,
+        "n_encoder_blocks": 12,
+        "n_heads": 2,
         "model_type": "Transformer",
         "positional_encoding": True,
     },
@@ -37,6 +37,8 @@ def main():
     config["torch_seed"] = 42
     torch.manual_seed(config["torch_seed"])
     config["classes"] = class_list
+    config["is_balanced"] = is_balanced
+    config["unknown_coef"] = unknown_coef
 
     assert config["model_parameters"]["d_embedding"] == config["dataset_parameters"]["n_mels"], "d_embedding must be equal to n_mels"
 
@@ -55,8 +57,8 @@ def main():
         hop_length = config["dataset_parameters"]["hop_length"]
     )
 
-    train_loader = DataLoader(train_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=True, num_workers=4)
+    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False, num_workers=4)
 
     model = components.AudioClassifier(
         n_classes = len(class_list),
