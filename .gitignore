@@ -7,6 +7,10 @@ dataset_preprocessed/
 speech_commands/
 model_analysis/conf_matrix/
 dataset_high_res_preprocessed/
+F1_vs_resolution/run_0/models/
+F1_vs_resolution/run_1/models/
+F1_vs_resolution/run_2/models/
+F1_vs_resolution/run_first/models/
 ./venv/
 __pycache__/
 *.json

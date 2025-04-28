@@ -5,11 +5,20 @@ from sklearn.metrics import f1_score
 class InitBlock(torch.nn.Module):
     def __init__(self, out_channels = 32):
         super(InitBlock, self).__init__()
+        '''
+        self.init_conv = torch.nn.Sequential(
+                torch.nn.Conv2d(1, out_channels, kernel_size = 3, stride = 1, padding = 1),
+                torch.nn.BatchNorm2d(out_channels, affine=True) 
+            )  
+        '''      
         self.init_conv = torch.nn.Conv2d(1, out_channels, kernel_size = 3, stride = 1, padding = 1)
     
     def forward(self, x):
+        #y = self.init_conv(x)
+        #return torch.nn.functional.relu(x + y, inplace = True)
         x = self.init_conv(x)
         return torch.nn.functional.relu(x, inplace = True)
+        
 
 class ConvolutionalBlock(torch.nn.Module):
     def __init__(self, in_channels = 32, out_channels = 32, bypass = False, batch_norm = False): 
@@ -47,6 +56,7 @@ class Module(torch.nn.Module):
         self.conv_in = ConvolutionalBlock(
                     in_channels = in_channels, 
                     out_channels = internal_channels,
+                    # this was changed from False/bypass
                     bypass = False,
                     batch_norm = batch_norm
                 )
