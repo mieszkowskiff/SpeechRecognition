@@ -11,14 +11,15 @@ import tqdm
 import sys
 
 sys.path.append("..")
-from utils.CNN_dataset import PreprocessedAudioDataset
+from utils.CNN_dataset import DynamicResolutionDataset
+import utils.CNN_components as components
 sys.path.remove("..")
        
 sys.path.append("..")
-import model_init.model_10_20 as model_arch
+import model_init.final as model_arch
 sys.path.remove("..")
 
-choose_model = "model_10_20"
+choose_model = "final"
 
 #class_list = ["down", "go", "left", "no", "right", "stop", "up", "yes"]
 #class_list = ["background", "down", "go", "left", "no", "right", "stop", "up", "yes"]
@@ -49,12 +50,13 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    test_dataset = PreprocessedAudioDataset(
-        root_dir="../dataset_preprocessed/test",
-        class_list=class_list
-    )
+    test_dataset = DynamicResolutionDataset(
+            root_dir="../dataset_high_res_preprocessed/test",
+            class_list=class_list,
+            target_n_mels=64
+        )
 
-    test_loader = DataLoader(test_dataset, batch_size = config["training_parameters"]["batch_size"], shuffle=False, num_workers=4, pin_memory=True)
+    test_loader = DataLoader(test_dataset, batch_size = 256, shuffle=False, num_workers=4, pin_memory=True)
     
     test_dataset_size = len(test_dataset)
 
@@ -85,6 +87,9 @@ def main():
             all_labels.extend(device_labels.cpu().numpy())
 
     print(f"Accuracy: {correctly_predicted / test_dataset_size:.4f}")
+    F1_score = components.evaluate_f1_score(model=model, test_loader=test_loader, device=device)
+    print(f"F1 score: {F1_score:.4f}")
+
 
     cm = confusion_matrix(all_labels, all_preds)
 
