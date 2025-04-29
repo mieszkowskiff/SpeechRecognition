@@ -9,15 +9,19 @@ def load_history(file_path):
     return history
 
 # Load data
-f1_history = load_history("F1_history.txt")
-loss_history = load_history("loss_history.txt")
-time_history = load_history("time_history.txt")
+run = "first"
+run_directory_path = "./run_" + str(run) + "/"
+f1_history = load_history(run_directory_path + "F1_history.txt")
+loss_history = load_history(run_directory_path + "loss_history.txt")
+time_history = load_history(run_directory_path + "time_history.txt")
 
 # n_mels values used during experiment
 n_mels_grid = [256, 128, 64, 32]
+#n_mels_grid = [32, 64, 128, 256]
 
 # Plot settings
-colors = ['blue', 'green', 'red', 'purple']
+#colors = ['blue', 'green', 'red', 'purple']
+colors = ['purple', 'red', 'green', 'blue']
 
 # Plot F1 history
 plt.figure(figsize=(10, 6))
