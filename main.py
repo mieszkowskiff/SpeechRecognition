@@ -9,25 +9,25 @@ import os
 from split_dataset import class_list, is_balanced, unknown_coef
 from torchsummary import summary
 
-epochs = 20
+epochs = 30
 
 config = {
     "model_parameters": {
-        "d_embedding": 64,
-        "d_attention_hidden": 64,
-        "d_ffn_hidden": 32,
-        "n_encoder_blocks": 10,
+        "d_embedding": 32,
+        "d_attention_hidden": 32,
+        "d_ffn_hidden": 16,
+        "n_encoder_blocks": 2,
         "n_heads": 2,
         "model_type": "Transformer",
         "positional_encoding": True,
     },
     "dataset_parameters": {
-        "n_fft": 400,
-        "hop_length": 100,
-        "n_mels": 64
+        "n_fft": 350,
+        "hop_length": 300,
+        "n_mels": 32
     },
     "training_parameters": {
-        "batch_size": 64,
+        "batch_size": 128,
     }
 }
 

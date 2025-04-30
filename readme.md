@@ -15,5 +15,8 @@ The dataset can be found [here](https://www.kaggle.com/c/tensorflow-speech-recog
 pip install torchaudio numpy matplotlib scikit-learn torchsummary
 ```
 
+## Usage
+After downloading the dataset run `split_dataset.py` to split dataset into train, valid and test part. (you can also run `create_unknown_class.py` earlier to merge classes into one). Select desired parameters in the `main.py` and run the file.
+Models will be saved under `./models/`. You can later analyze the model using `create_confusion_matrix.py` or `transformed_spectrogram.py`.
 
 
