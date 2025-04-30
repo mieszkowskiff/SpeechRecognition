@@ -31,7 +31,7 @@ model.to(device)
 model.eval()
 
 test_dataset = dataset.AudioDataset(
-    root_dir="./dataset/valid", 
+    root_dir="./dataset/test", 
     n_mels = config["dataset_parameters"]["n_mels"], 
     n_fft = config["dataset_parameters"]["n_fft"],
     hop_length = config["dataset_parameters"]["hop_length"]
@@ -72,5 +72,7 @@ plt.ylabel('True label')
 plt.xlabel('Predicted label')
 plt.tight_layout()
 plt.savefig(f"./images/confusion_matrix.png")
+
+print(components.evaluate_f1_score(model, test_loader, device))
 
 
