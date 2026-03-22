@@ -2,9 +2,9 @@
 
 ## Introduction
 
-This project is a part of Summer Semester 2024/2025 Deeplearning course at Warsaw University of Technology, faculty of Mathematics and Information Sciences.
+This project is a part of the Summer Semester 2024/2025 Deep Learning course at the Warsaw University of Technology, Faculty of Mathematics and Information Sciences.
 
-The aim of this project is to implement several deeplearning architectures (including transformers and CNNs) to classify basic speech commands.
+The aim of this project is to implement several deep learning architectures (mainly Transformers) to classify basic speech commands.
 
 ## Prepare the dataset
 
@@ -25,9 +25,14 @@ Run the script to split the dataset. The processed files will be saved under a n
 ## Setup
 
 **Linux**:
+
+Create virual environment:
 ```{Bash}
 python3 -m venv venv
 source venv/bin/activate
+```
+Install required libraries:
+```{Bash}
 pip install torchaudio numpy matplotlib scikit-learn torchsummary torchcodec
 ```
 
@@ -39,39 +44,38 @@ sudo apt install ffmpeg
 
 ## Usage
 
-After downloading the dataset run `split_dataset.py` to split dataset into train, valid and test part. (See section Prepare the dataset)
+After downloading the dataset, run `split_dataset.py` to split the dataset into train, validation, and test parts. (See the [Prepare the dataset](#prepare-the-dataset) section).
 
 ### Training
 
-Select desired parameters in the `train.py` and run the file.
-Models will be saved under `./models/`, each model in separate directory.
-Model (and optimizer) will be saved afer each epoch.
+Select the desired parameters in `train.py` and run the file.
+Models will be saved under `./models/`, with each model in a separate directory.
+The model (and optimizer) will be saved after each epoch.
 
 ### Create confusion matrix
 
-To create confusion matrix run `create_confusion_matrix.py`.
-First select model (path and iteration) inside the `create_confusion_matrix.py` file.
-Confusion matrix will be saved under `images` directory.
-
+To create a confusion matrix, run `create_confusion_matrix.py`.
+First, select the model (path and iteration) inside the `create_confusion_matrix.py` file.
+The confusion matrix will be saved under the `images/` directory.
 **Example confusion matrix:**
 <img title="Confusion matrix" alt="Confusion matrix" src="./images/confusion_matrix.png">
 
-### Create learning curve
+### Create a learning curve
 
-To create learning curve run `create_learning_curve.py`.
-First select model inside the `create_learning_curve.py` file.
-Learning curve will be saved under `images` directory.
+To create a learning curve, run `create_learning_curve.py`.
+First, select the model inside the `create_learning_curve.py` file.
+The learning curve will be saved under the `images/` directory.
 
-**Example learning curve**
+**Example learning curve:**
 <img title="Learning curve" alt="Learning curve" src="./images/learning_curve.png">
 
-### Create spectorgram
+### Create a spectrogram
 
-You can also create a spectrogram (picture) of a given sound file. This is of course independent of deeplearning. To do so, run `create_spectrogram.py` (you can first select picture id inside it). It will also be saved inside `images/` directory.
+You can also create a spectrogram (image) of a given sound file. This process is independent of deep learning. To do so, run `create_spectrogram.py` (you can first select the file ID inside it). It will also be saved inside the `images/` directory.
 
-**Example spectrogram**
-<img title="Learning curve" alt="Learning curve" src="./images/spectrogram.png">
+**Example spectrogram:**
+<img title="Spectrogram" alt="Spectrogram" src="./images/spectrogram.png">
 
 ## Results
-Experiments were conducted trying to determine optimal number of bloks and number of attention heads in each block. The results are presented below (big number is the f1 score, small number below is the number of parameters).
-<img title="Learning curve" alt="Learning curve" src="./images/f1s_matrix.png">
+Experiments were conducted to determine the optimal number of blocks and the number of attention heads in each block. The results are presented below (the larger number represents the F1 score, and the smaller number below it indicates the number of parameters).
+<img title="Results matrix" alt="Results matrix" src="./images/f1s_matrix.png">
