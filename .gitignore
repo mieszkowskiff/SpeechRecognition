@@ -10,3 +10,5 @@ audio/
 
 !images/confusion_matrix.png
 !images/learning_curve.png
+!images/f1s_matrix.png
+!images/spectrogram.png
