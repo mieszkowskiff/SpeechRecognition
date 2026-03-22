@@ -1,9 +1,12 @@
 dataset/
 speech_commands/
-./venv/
+venv/
 __pycache__/
 *.json
 *.pth
 *.png
 *.gif
 audio/
+
+!images/confusion_matrix.png
+!images/learning_curve.png

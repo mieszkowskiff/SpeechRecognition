@@ -6,7 +6,6 @@ import torch
 
 log_transform = T.AmplitudeToDB(stype="power")
 
-# Ścieżka do folderu
 root_dir = './data/train'
 
 class AudioDataset(Dataset):
@@ -32,7 +31,6 @@ class AudioDataset(Dataset):
             win_length = n_fft
         )
 
-        # Iteracja po folderach
         for idx, label in enumerate(sorted(os.listdir(root_dir))):
             folder = os.path.join(root_dir, label)
             if os.path.isdir(folder):
@@ -72,7 +70,6 @@ def get_observation(
     waveform, sr = torchaudio.load(path)
 
         
-        # Jeśli stereo, konwertujemy na mono
     if waveform.shape[0] > 1:
             waveform = waveform.mean(dim=0, keepdim=True)
     transform = T.MelSpectrogram(

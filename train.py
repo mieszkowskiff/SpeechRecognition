@@ -7,7 +7,6 @@ import json
 from datetime import datetime
 import os
 from split_dataset import class_list, is_balanced, unknown_coef
-from torchsummary import summary
 
 epochs = 30
 
@@ -69,7 +68,6 @@ def main():
         n_heads = config["model_parameters"]["n_heads"],
         positional_encoding = config["model_parameters"]["positional_encoding"]
     )
-    summary(model)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     criterion = torch.nn.CrossEntropyLoss()

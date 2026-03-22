@@ -2,7 +2,7 @@ import dataset
 import torch
 import matplotlib.pyplot as plt
 
-
+picture_id = 12892
 
 
 def create_spectrogram(picture, filename):
@@ -12,7 +12,7 @@ def create_spectrogram(picture, filename):
     ax.set_title('Mel-Spectrogram')
     ax.set_xlabel('Time Frame')
     ax.set_ylabel('Mel Frequency Band')
-    #fig.colorbar(cax, ax=ax, format='%+2.0f dB')
+
     fig.tight_layout()
     fig.savefig(filename, dpi=300)
     plt.close(fig)
@@ -24,7 +24,7 @@ def main():
         n_fft=400,
         hop_length=100
         )
-    picture, label = audio_dataset[12892]
+    picture, label = audio_dataset[picture_id]
     print(label)
     print(picture.shape)
     create_spectrogram(picture, filename="./images/input.png")

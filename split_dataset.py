@@ -46,7 +46,6 @@ def split_dataset(input_dir, output_dir, split_ratios=(0.7, 0.2, 0.1),
         images = list(class_dir.glob("*"))
         random.shuffle(images)
 
-        # Określ ile plików bierzemy
         if class_name in main_classes:
             if min_count:
                 images = images[:min_count]
